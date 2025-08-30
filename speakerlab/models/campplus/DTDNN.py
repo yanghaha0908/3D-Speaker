@@ -108,8 +108,17 @@ class CAMPPlus(nn.Module):
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
 
-    def forward(self, x):
-        x = x.permute(0, 2, 1)  # (B,T,F) => (B,F,T)
-        x = self.head(x)
-        x = self.xvector(x)
-        return x
+    def forward(self, x, extract_feature=False):
+        x = x.permute(0, 2, 1)  # (B,T,F) => (B,F,T)  #torch.Size([1, 80, 370])
+        x = self.head(x) #torch.Size([1, 320, 370])  #1,320,L,
+        
+                
+        if extract_feature:
+            for name, module in self.xvector.named_children():
+                if name == 'stats':
+                    break
+                x = module(x)
+            return x
+        else:
+            x = self.xvector(x)
+            return x

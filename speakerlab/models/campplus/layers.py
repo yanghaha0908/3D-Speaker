@@ -23,11 +23,11 @@ def get_nonlinear(config_str, channels):
             raise ValueError('Unexpected module ({}).'.format(name))
     return nonlinear
 
-def statistics_pooling(x, dim=-1, keepdim=False, unbiased=True, eps=1e-2):
-    mean = x.mean(dim=dim)
-    std = x.std(dim=dim, unbiased=unbiased)
-    stats = torch.cat([mean, std], dim=-1)
-    if keepdim:
+def statistics_pooling(x, dim=-1, keepdim=False, unbiased=True, eps=1e-2): #torch.Size([1, 512, 185])
+    mean = x.mean(dim=dim) # torch.Size([1, 512])
+    std = x.std(dim=dim, unbiased=unbiased) #torch.Size([1, 512])
+    stats = torch.cat([mean, std], dim=-1) #torch.Size([1, 1024])
+    if keepdim: #x
         stats = stats.unsqueeze(dim=dim)
     return stats
 
@@ -62,7 +62,7 @@ class TDNNLayer(nn.Module):
         self.nonlinear = get_nonlinear(config_str, out_channels)
 
     def forward(self, x):
-        x = self.linear(x)
+        x = self.linear(x) #torch.Size([1, 128, 185])
         x = self.nonlinear(x)
         return x
 
